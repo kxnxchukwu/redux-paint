@@ -1,33 +1,41 @@
-import { ReactElement, useEffect, useRef, MouseEvent } from "react";
+import { ReactElement, useEffect, MouseEvent, useCallback } from "react";
 import { WIDTH, HEIGHT } from "./constants";
 import "./App.css";
 import { clearCanvas, drawStroke, setCanvasSize } from "./utils/canvasUtils";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { beginStroke, endStroke, updateStroke } from "./actions";
-import {
-  currentStrokeSelector,
-  historyIndexSelector,
-  strokesSelector,
-} from "./rootReducer";
+
 import { ColourPanel } from "./shared/ColourPanel";
 import { EditPanel } from "./shared/EditPanel";
+import { currentStrokeSelector } from "./modules/currentStroke/reducer";
+import { historyIndexSelector } from "./modules/historyIndex/reducer";
+import { strokesSelector } from "./modules/strokes/reducer";
+import {
+  beginStroke,
+  endStroke,
+  updateStroke,
+} from "./modules/currentStroke/actions";
+import { useCanvas } from "./CanvasContext";
+import { FilePanel } from "./shared/FilePanel";
 
 function App(): ReactElement {
   const dispatch = useDispatch();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useCanvas();
   const currentStroke = useSelector(currentStrokeSelector);
   const isDrawing = !!currentStroke.points.length;
   const historyIndex = useSelector(historyIndexSelector);
   const strokes = useSelector(strokesSelector);
-  const getCanvasWithContext = (
-    canvas: HTMLCanvasElement = canvasRef.current as HTMLCanvasElement
-  ): {
-    canvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D | null;
-  } => {
-    return { canvas, context: canvas?.getContext("2d") };
-  };
+  const getCanvasWithContext = useCallback(
+    (
+      canvas: HTMLCanvasElement = canvasRef.current as HTMLCanvasElement
+    ): {
+      canvas: HTMLCanvasElement;
+      context: CanvasRenderingContext2D | null;
+    } => {
+      return { canvas, context: canvas?.getContext("2d") };
+    },
+    [canvasRef]
+  );
 
   useEffect(() => {
     const { canvas, context } = getCanvasWithContext();
@@ -45,7 +53,7 @@ function App(): ReactElement {
           drawStroke({ context, points: stroke.points, colour: stroke.colour })
         );
     });
-  }, [historyIndex]);
+  }, [historyIndex, strokes, getCanvasWithContext]);
 
   useEffect(() => {
     const { canvas, context } = getCanvasWithContext();
@@ -78,7 +86,7 @@ function App(): ReactElement {
         colour: currentStroke.colour,
       });
     });
-  }, [currentStroke]);
+  }, [currentStroke, getCanvasWithContext]);
 
   const startDrawing = ({ nativeEvent }: MouseEvent<HTMLCanvasElement>) => {
     const { offsetX, offsetY } = nativeEvent;
@@ -87,7 +95,7 @@ function App(): ReactElement {
 
   const endDrawing = () => {
     if (isDrawing) {
-      dispatch(endStroke());
+      dispatch(endStroke({ stroke: currentStroke, historyIndex }));
     }
   };
 
@@ -111,6 +119,7 @@ function App(): ReactElement {
       </div>
       <EditPanel />
       <ColourPanel />
+      <FilePanel />
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
