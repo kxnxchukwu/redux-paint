@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { useDispatch } from "react-redux";
-import { setStrokeColour } from "../modules/currentStroke/actions";
+import { setStrokeColour } from "../modules/currentStroke/slice";
 
 const COLOURS = [
   "#000000",
