@@ -1,4 +1,10 @@
-import { ReactElement, useEffect, MouseEvent, useCallback } from "react";
+import {
+  ReactElement,
+  useEffect,
+  MouseEvent,
+  useCallback,
+  CSSProperties,
+} from "react";
 import { WIDTH, HEIGHT } from "./constants";
 import "./App.css";
 import { clearCanvas, drawStroke, setCanvasSize } from "./utils/canvasUtils";
@@ -7,16 +13,19 @@ import { useDispatch } from "react-redux";
 
 import { ColourPanel } from "./shared/ColourPanel";
 import { EditPanel } from "./shared/EditPanel";
-import { currentStrokeSelector } from "./modules/currentStroke/reducer";
-import { historyIndexSelector } from "./modules/historyIndex/reducer";
-import { strokesSelector } from "./modules/strokes/reducer";
 import {
   beginStroke,
-  endStroke,
+  currentStrokeSelector,
   updateStroke,
-} from "./modules/currentStroke/actions";
+} from "./modules/currentStroke/slice";
+import { historyIndexSelector } from "./modules/historyIndex/slice";
+import { strokesSelector } from "./modules/strokes/slice";
+import { endStroke } from "./modules/sharedActions";
 import { useCanvas } from "./CanvasContext";
 import { FilePanel } from "./shared/FilePanel";
+import ModalLayer from "./ModalLayer";
+
+const STYLE: CSSProperties = { width: "100%", height: "100%" };
 
 function App(): ReactElement {
   const dispatch = useDispatch();
@@ -70,7 +79,7 @@ function App(): ReactElement {
     context.strokeStyle = "black";
 
     clearCanvas(canvas);
-  }, []);
+  }, [getCanvasWithContext]);
 
   useEffect(() => {
     const { context } = getCanvasWithContext();
@@ -110,7 +119,7 @@ function App(): ReactElement {
   };
 
   return (
-    <div className="window">
+    <div className="window" style={STYLE}>
       <div className="title-bar">
         <div className="title-bar-text">Redux Paint</div>
         <div className="title-bar-controls">
@@ -120,6 +129,7 @@ function App(): ReactElement {
       <EditPanel />
       <ColourPanel />
       <FilePanel />
+      <ModalLayer />
       <canvas
         ref={canvasRef}
         onMouseDown={startDrawing}
