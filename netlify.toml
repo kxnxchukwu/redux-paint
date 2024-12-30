@@ -1,6 +1,6 @@
 [build]
     functions = "./netlify/functions"
-    environment = { NODE_VERSION = "18" }
+    environment = { NODE_VERSION = "18", AWS_LAMBDA_JS_RUNTIME = "nodejs18.x" }
 
 [functions]
   # Set the directory where your serverless functions are stored
