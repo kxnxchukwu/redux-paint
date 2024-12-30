@@ -21,9 +21,9 @@ export const saveProject = createAsyncThunk(
     };
     try {
       const response = await newProject(data);
-      console.log({ response });
+      return response;
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 );
