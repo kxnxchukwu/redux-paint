@@ -6,15 +6,29 @@ import { nanoid } from "nanoid";
 const MONGODB_URI = process.env.MONGODB_URI as string;
 const DB_NAME = process.env.DB_NAME as string;
 
+if (!MONGODB_URI) {
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env"
+  );
+}
+
+if (!DB_NAME) {
+  throw new Error("Please define the DB_NAME environment variable inside .env");
+}
+
 // MongoDB client and database
-const client = new MongoClient(MONGODB_URI);
+let client: MongoClient | null = null;
 let db: Db | null = null;
 
-async function connectToDatabase(): Promise<Db> {
-  if (!db) {
-    await client.connect();
-    db = client.db(DB_NAME);
+export async function connectToDatabase(): Promise<Db> {
+  if (db) {
+    return db;
   }
+  if (!client) {
+    client = new MongoClient(MONGODB_URI);
+    await client.connect();
+  }
+  db = client.db(DB_NAME);
   return db;
 }
 
