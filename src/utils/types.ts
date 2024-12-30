@@ -14,6 +14,7 @@ export interface Project {
   image: string;
   name: string;
   id: string;
+  strokes: Stroke[];
 }
 
 export interface ProjectList {
