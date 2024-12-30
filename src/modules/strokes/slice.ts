@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../utils/types";
 import { endStroke } from "../sharedActions";
-import { getProject, newProject } from "./api";
+import { newProject } from "../../api";
+import { getProjectById } from "../projectsList/slice";
 
 const initialState: RootState["strokes"] = [];
 
@@ -13,13 +14,14 @@ type SaveProjectArg = {
 export const saveProject = createAsyncThunk(
   "SAVE_PROJECT",
   async ({ projectName, thumbnail }: SaveProjectArg, { getState }) => {
+    const data = {
+      name: projectName,
+      image: thumbnail,
+      strokes: (getState() as RootState)?.strokes,
+    };
     try {
-      const response = await newProject(
-        projectName,
-        (getState() as RootState)?.strokes,
-        thumbnail
-      );
-      console.log(response);
+      const response = await newProject(data);
+      console.log({ response });
     } catch (err) {
       console.log(err);
     }
@@ -28,9 +30,9 @@ export const saveProject = createAsyncThunk(
 
 export const loadProject = createAsyncThunk(
   "LOAD_PROJECT",
-  async (projectId: string) => {
+  async (projectId: string, { getState }) => {
     try {
-      const { project } = await getProject(projectId);
+      const project = await getProjectById(getState() as RootState, projectId);
       return project;
     } catch (error) {
       console.error(error);
@@ -52,7 +54,7 @@ const strokes = createSlice({
       }
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
-      return action.payload.strokes;
+      return action.payload?.strokes;
     });
   },
 });
