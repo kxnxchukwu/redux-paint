@@ -1,21 +1,25 @@
 [build]
     functions = "./netlify/functions"
     environment = { NODE_VERSION = "18", AWS_LAMBDA_JS_RUNTIME = "nodejs18.x" }
+    command = "npm run build"
+    publish = "build"
 
 [functions]
   # Set the directory where your serverless functions are stored
   directory = ".netlify/functions"
+  node_bundler = "esbuild"
   
   # Set the default runtime for your serverless functions
   # For example, `nodejs18.x` for Node.js 18
   [functions.runtime]
     external_node_modules = [
       "nodejs18.x",
+      "mongodb",
+      "dotenv"
     ]
   [functions.projects]
-    timeout = 10  # Increase timeout to 10 seconds
+    timeout = 20  # Increase timeout to 10 seconds
     memory = 1024 # Increase memory to 1GB
-  
 [dev]
   # Local development options
   functions = ".netlify/functions"
