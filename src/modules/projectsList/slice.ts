@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../utils/types";
-import { fetchProjectsList } from "./api";
+import { Project, RootState } from "../../utils/types";
+import { fetchProjectsList } from "../../api";
 
 const initialState: RootState["projectsList"] = {
   error: undefined,
@@ -47,4 +47,14 @@ export const projectsListPendingSelector = (state: RootState): boolean => {
 
 export const projectsListErrorSelector = (state: RootState) => {
   return state.projectsList.error;
+};
+
+export const getProjectById = (state: RootState, projectId: string) => {
+  const projects = projectsListSelector(state);
+  if (!projects) return {} as Project;
+
+  const project = projects.find((project) => project.id === projectId);
+  if (!project) return {} as Project;
+
+  return project;
 };
