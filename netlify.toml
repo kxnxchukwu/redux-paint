@@ -1,0 +1,25 @@
+[build]
+  # The directory to deploy to on Netlify
+  publish = "build"
+  
+  # Specify the command to build the project (if needed)
+  # For example, for React: npm run build
+  # or for a general Node.js project: npm install && npm run build
+  command = "npm run build"
+
+[functions]
+  # Set the directory where your serverless functions are stored
+  directory = ".netlify/functions"
+  
+  # Set the default runtime for your serverless functions
+  # For example, `nodejs18.x` for Node.js 18
+  [functions.runtime]
+    external_node_modules = [
+      "nodejs18.x",
+    ]
+  
+[dev]
+  # Local development options
+  functions = ".netlify/functions"
+  port = 8888
+  # This will make Netlify Dev run the app on the specified port
