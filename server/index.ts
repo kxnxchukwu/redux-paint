@@ -41,14 +41,14 @@ app.use(bodyParser.json());
 
 const port = 4000;
 
-app.get("/projects", (req, res) => {
+app.get("/projects", (_req, res) => {
   const data = db.get("projects").value();
   const projects = data.map((project) => ({
     name: project.name,
     image: project.image,
     id: project.id,
   }));
-  return res.json(projects);
+  res.json(projects);
 });
 
 app.post("/projects/new", (req, res) => {
@@ -63,12 +63,12 @@ app.get("/projects/:projectId", (req, res) => {
   const project = db.get("projects").find({ id: projectId }).value();
 
   if (project) {
-    return res.json({
+    res.json({
       success: true,
       project,
     });
   } else {
-    return res.json({
+    res.json({
       success: false,
     });
   }
